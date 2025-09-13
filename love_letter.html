@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokémon Love Letter</title>
+  <link rel="stylesheet" href="cake.css"/>
+  <!--<link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet"> -->
+  <link href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@400..700&display=swap" rel="stylesheet">
+</head>
+  <style>
+    body {
+      margin: 0;
+      height: 200vh; /* Full viewport height */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: pink;
+      background-size: cover;
+      font-family: 'Pixelify Sans', sans-serif;
+      color: black;
+    }
+
+    .container {
+      text-align: center;
+    }
+
+    /* Battle-style text box */
+    .battle-box {
+      border: 4px solid black;
+      background: white;
+      padding: 20px;
+      width: 400px;
+      margin: 20px auto;
+      font-size: 14px;
+      box-shadow: 5px 5px 0px black;
+    }
+
+    strong, em{
+      background: #fff
+    }
+    /* Pokédex entry box */
+    .pokedex-box {
+      border: 4px solid #333;
+      background: #fff;
+      padding: 20px;
+      width: 400px;
+      margin: 20px auto;
+      font-size: 12px;
+      text-align: left;
+      box-shadow: 5px 5px 0px #555;
+    }
+
+    /* Love letter animation */
+    .love_letter {
+      font-size: 80px;
+      animation: pulse 1.5s infinite;
+      text-decoration: none;
+    }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.2); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>To My Dearest Love 💖</h1>
+
+     <!--Battle Box --> 
+    <div class="battle-box">
+      <strong>💌 A Love Letter Appeared!<br>
+      It's super effective!</strong>
+    </div>
+
+     <!--Pokedex Entry--> 
+    <div class="pokedex-box">
+      <strong>Love Letter</strong><br>
+      Category: Legendary Affection Pokémon<br>
+      Height: Endless feelings<br>
+      Weight: Heavier than my heart when you’re away<br><br>
+      Description: This letter evolves whenever you smile. 
+      It knows the move <em>"I Choose You"</em>.
+    </div>
+
+   <!--Background music (optional)--> 
+  <audio autoplay loop hidden>
+    <source src="pallet-town.mp3" type="audio/mpeg">
+  </audio>
+
+  <div class="container">
+    <div id="birthdayText"></div>
+    <div class="cake-container">
+      <div class="cake" id="cake"></div>
+  </div>
+  <div id="subTitle"></div>
+  </div>
+    <script>
+        //always use 4 candles
+        const candleCount = 5;
+        //read URL params
+        const params = new URLSearchParams(window.location.search);
+        const name = params.get('name') || 'My Love';
+        const birthdayText = document.getElementById('birthdayText');
+        const subTtile = document.getElementById('subTitle');
+        birthdayText.innerHTML = `
+        <div id="mainTitle">Happy Birthday, ${name}!</div>
+        `;
+        subTitle.textContent = "Make a wish and blow out the candles!";
+
+        const cake = document.querySelector(".cake");
+
+        const colors = [
+            "red-candle", // Red
+            "green-candle", // Green
+            "blue-candle", // Blue
+            "yellow-candle", // Yellow
+        ];
+
+        const CAKE_VISUAL_WIDTH = 35; //pixels per candle
+
+        function createCandles(count){
+            cake.innerHTML = ""; //clear existing candles
+            const CANDLE_VISUAL_WIDTH = 2;
+            const availableWidth = CAKE_VISUAL_WIDTH;
+            const candlesPerRow = 5;
+            const rowCount = Math.ceil(count / candlesPerRow);
+            const shiftAmount = 5;
+
+            for(let i = 0; i <count; i++ ){
+                const candle = document. createElement("div");
+                candle.classList.add("candle");
+                const colorClass = colors[i % colors.length]; //use fixed colors order
+                candle.classList.add(colorClass);
+
+                const row = Math.floor(i / candlesPerRow);
+                const col = i % candlesPerRow;
+                const totalCandlesInRow = Math.min(candlesPerRow, count - row * candlesPerRow);
+                const rowSpacing = availableWidth / (totalCandlesInRow + 1);
+
+                const leftBase = rowSpacing * (col + 1) - CANDLE_VISUAL_WIDTH / 2 + 5;
+                const rowShift = row %  2 === 0 ? 0 : shiftAmount;
+
+                candle.style.position = "absolute";
+                candle.style.top = `${10 + row * 3}px`;
+                candle.style.left = `${leftBase - rowShift + 4}px`;
+
+                cake.appendChild(candle);
+            }
+        }
+
+        createCandles(candleCount);
+
+        // === Microphone / Blow Detection===
+        async function startMicDetection(){
+            try{
+                const stream = await navigator.mediaDevices.getUserMedia({audio: true,});
+                const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                const source = audioContext.createMediaStreamSource(stream);
+                const analyser = audioContext.createAnalyser();
+                analyser.fftSize = 512;
+
+                source.connect(analyser);
+
+                const dataArray = new Uint8Array(analyser.frequencyBinCount);
+
+                let blown = false;
+
+                function detectBlow(){
+                    analyser.getByteFrequencyData(dataArray);
+
+                    let highFreqSum = 0;
+                    let lowFreqSum = 0;
+
+                    const midpoint = dataArray.length / 2;
+
+                    for (let i = 0; i < dataArray.length; i++ ){
+                        if(i < midpoint){
+                            lowFreqSum += dataArray[i];
+                        } else {
+                            highFreqSum += dataArray[i];
+                        }
+                    }
+
+                    const highAvg = highFreqSum / (dataArray.length / 2);
+                    const lowAvg = lowFreqSum / (dataArray.length / 2);
+
+                    const ratio = highAvg / (lowAvg + 1);
+
+                    const BLOW_RATIO_THRESHOLD = 0.5;
+
+                    if(ratio > BLOW_RATIO_THRESHOLD && !blown){
+                        blown = true;
+                        blowOutCandles();
+                    }
+
+                    requestAnimationFrame(detectBlow);
+                }
+
+                detectBlow();
+            } catch (err){
+                console.error("Mic access error: ", err);
+            }
+        }
+
+        function blowOutCandles(){
+            const candles = document.querySelectorAll(".candle");
+            candles.forEach((candle) => {
+                const delay = Math.random() * 1000;
+                setTimeout(() => {
+                     candle.classList.add("blown");
+            }, delay);
+            });
+
+            //Update subTitle after short delay
+            setTimeout(() => {
+                subTitle.textContent = "Yayy! Wishing you the coolest birthday ever, Sayang!";
+            }, 1200);
+        }
+
+        startMicDetection();
+    </script>
+</body>
+</html>
+
+
+    

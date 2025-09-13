@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <link rel="stylesheet" href=""/>
+        <title>Happy Birthday</title>
+    </head>
+    <body>
+        <div class="container">
+        <h1>Happy Birthday Love!</h1>
+        <p class="hint">click here! &#8595; </p>
+        <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+        <a href="love_letter.html" class="love_letter"> 💌 </a>
+        </div>
+
+        <style>
+            body {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                font-family: 'Press Start 2P', cursive;
+                height: 100vh; /*full viewport height*/
+                background-color: pink;
+                margin: 0;
+            }
+            .container {
+                display: flex;
+                flex-direction: column; /*stack text and symbol vertically*/
+                align-items: center; /*center horizontally*/
+            }
+            .hint{
+                font-size: 14px;
+                margin: 5px 0; /*space between text and symbol*/
+                color: gray;
+                font-style: italic;
+            }
+            .love_letter{
+            font-size: 100px;
+            text-decoration: none; /*remove underline*/
+            animation: pulse 1.5s infinite; /*animation*/
+            }      
+
+            @keyframes pulse {
+               0%, 100% {
+                transform: scale(1);
+               }
+               50% {
+                transform: scale(1.2); /*enlarge to 1.2 times*/
+               }
+            }
+        </style>
+         
+    </body>
+</html>
+
